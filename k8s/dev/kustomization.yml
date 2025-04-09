@@ -1,0 +1,12 @@
+appVersion: kustomize.connfig.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: local-data-dev
+
+helmCharts:
+- name: airflow
+  namespace: local-data-dev
+  releaseName: airflow
+  repo: https://airflow.apache.org/
+  version: 1.12.0
+  valuesFile: config/helm.values.yml
