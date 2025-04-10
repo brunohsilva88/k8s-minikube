@@ -18,10 +18,10 @@ webserver:
 # Airflow configurations
 config:
   AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-  AIRFLOW__CORE__FERNET_KEY: "your-fernet-key"  # use openssl rand -base64 32
+  AIRFLOW__CORE__FERNET_KEY: "{{ .Values.secrets.fernetKey }}"
   AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
   AIRFLOW__CORE__LOAD_EXAMPLES: "true"
-  
+
 
 # Users - Admin default login
 users:
