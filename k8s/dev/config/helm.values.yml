@@ -1,0 +1,468 @@
+# images:
+#   airflow:
+#     repository: "registry.gitlab.com/laredoute/data/apps/shrd_data/components/airflow"
+#     tag: "2.10.4.6"
+#   migrationsWaitTimeout: 500
+
+# registry:
+#   secretName: "gitlab-registry-token"
+
+config:
+  webserver:
+    enable_proxy_fix: 'True'
+    # For Airflow 1.10
+    rbac: 'True'
+    authenticate: 'True'
+    expose_config: 'True'
+    show_trigger_form_if_no_params: 'True'
+  # smtp:
+  #   smtp_host: smtp.sendgrid.net
+  #   smtp_starttls: false
+  #   smtp_ssl: false
+  #   smtp_user: apikey
+  #   smtp_port: 587
+  #   smtp_mail_from: data-dev-airflow@redoute.io
+  # api:
+  #   auth_backends: airflow.providers.fab.auth_manager.api.auth.backend.basic_auth
+
+useStandardNaming: false
+# Max number of old replicasets to retain. Can be overridden by each deployment's revisionHistoryLimit
+revisionHistoryLimit: 2
+# secret:
+#   - envName: AIRFLOW__SMTP__SMTP_PASSWORD
+#     secretName: airflow-smtp-sendgrid
+#     secretKey: SENDGRID_APIKEY
+#   - envName: AIRFLOW_CONN_DATABRICKS_DEFAULT
+#     secretName: airflow-databricks
+#     secretKey: AIRFLOW_CONN_DATABRICKS_DEFAULT
+#   - envName: AIRFLOW_VAR_GITLAB_DEPLOY_TOKEN-DABS-UTILS
+#     secretName: airflow-gitlab-dabs-utils
+#     secretKey: DEPLOY_TOKEN
+
+securityContexts:
+  pod:
+    runAsUser: 50000
+    fsGroup: 0
+    runAsGroup: 0
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    runAsUser: 50000
+    runAsGroup: 0
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+
+dags:
+  gitSync:
+    enabled: true
+    repo: https://gitlab.com/laredoute/data/apps/shrd_data/components/dags.git
+    branch: dev
+    credentialsSecret: airflow-gitsync
+    subPath: "dags"
+    wait: 10
+    maxFailures: 5
+    resources:
+      limits:
+        cpu: 300m
+        memory: 1Gi
+      requests:
+        cpu: 200m
+        memory: 512Mi
+    securityContexts:
+      container:
+        runAsUser: 65533
+        runAsGroup: 0
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+
+webserverSecretKey: Bohe2006
+# fernetKeySecretName: airflow-fernet
+
+
+enableBuiltInSecretEnvVars:
+  # AIRFLOW__CORE__FERNET_KEY: true
+  # # For Airflow <2.3, backward compatibility; moved to [database] in 2.3
+  # AIRFLOW__CORE__SQL_ALCHEMY_CONN: true
+  # AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: true
+  # AIRFLOW_CONN_AIRFLOW_DB: true
+  # AIRFLOW__WEBSERVER__SECRET_KEY: true
+  # AIRFLOW__CELERY__CELERY_RESULT_BACKEND: true
+  # AIRFLOW__CELERY__RESULT_BACKEND: true
+  # AIRFLOW__CELERY__BROKER_URL: true
+  # AIRFLOW__ELASTICSEARCH__HOST: true
+  # AIRFLOW__ELASTICSEARCH__ELASTICSEARCH_HOST: true
+
+# # Ingress configuration
+# ingress:
+#   # Enable all ingress resources (deprecated - use ingress.web.enabled and ingress.flower.enabled)
+#   enabled: true
+
+#   # Configs for the Ingress of the web Service
+#   web:
+#     # Enable web ingress resource
+#     enabled: true
+#     # Annotations for the web Ingress
+#     annotations:
+#       cert-manager.io/cluster-issuer: laredoute-internal-issuer
+#       kubernetes.io/tls-acme: "true"
+#       external-dns.alpha.kubernetes.io/hostname: data-airflow-k8sit-prd-frc-02.dev.azr.laredoute.internal
+#       external-dns.alpha.kubernetes.io/ingress-hostname-source: annotation-only
+#     # The path for the web Ingress
+#     path: "/"
+#     # The pathType for the above path (used only with Kubernetes v1.19 and above)
+#     pathType: "ImplementationSpecific"
+
+
+#     # The hostnames or hosts configuration for the web Ingress
+#     hosts:
+#     - name: "data-airflow-k8sit-prd-frc-02.dev.azr.laredoute.internal"
+#       # configs for web Ingress TLS
+#       tls:
+#         # Enable TLS termination for the web Ingress
+#         enabled: true
+#         # the name of a pre-created Secret containing a TLS private key and certificate
+#         secretName: "airflow-web-k8s-azr-tls"
+#     - name: "data-airflow.dev.azr.laredoute.internal"
+#       # configs for web Ingress TLS
+#       tls:
+#         # Enable TLS termination for the web Ingress
+#         enabled: true
+#         # the name of a pre-created Secret containing a TLS private key and certificate
+#         secretName: "airflow-web-azr-tls"
+#     - name: "data-airflow.dev.laredoute.internal"
+#       # configs for web Ingress TLS
+#       tls:
+#         # Enable TLS termination for the web Ingress
+#         enabled: true
+#         # the name of a pre-created Secret containing a TLS private key and certificate
+#         secretName: "airflow-web-tls"
+
+#     # The Ingress Class for the web Ingress (used only with Kubernetes v1.19 and above)
+#     ingressClassName: "nginx"
+
+
+#   # Configs for the Ingress of the flower Service
+#   flower:
+#     # Enable web ingress resource
+#     enabled: false
+
+#     # Annotations for the flower Ingress
+#     annotations: {}
+
+#     # The path for the flower Ingress
+#     path: "/"
+
+#     # The pathType for the above path (used only with Kubernetes v1.19 and above)
+#     pathType: "ImplementationSpecific"
+
+#     # The hostname for the flower Ingress (Deprecated - renamed to `ingress.flower.hosts`)
+#     host: ""
+
+#     # The hostnames or hosts configuration for the flower Ingress
+#     hosts: []
+#     #   # The hostname for the flower Ingress (can be templated)
+#     # - name: ""
+#     #   tls:
+#     #     # Enable TLS termination for the flower Ingress
+#     #     enabled: false
+#     #     # the name of a pre-created Secret containing a TLS private key and certificate
+#     #     secretName: ""
+
+#     # The Ingress Class for the flower Ingress (used only with Kubernetes v1.19 and above)
+#     ingressClassName: ""
+
+#     # configs for flower Ingress TLS (Deprecated - renamed to `ingress.flower.hosts[*].tls`)
+#     tls:
+#       # Enable TLS termination for the flower Ingress
+#       enabled: false
+#       # the name of a pre-created Secret containing a TLS private key and certificate
+#       secretName: ""
+
+# Airflow executor
+# One of: LocalExecutor, LocalKubernetesExecutor, CeleryExecutor, KubernetesExecutor, CeleryKubernetesExecutor
+executor: "CeleryExecutor"
+
+# Airflow Worker Config
+workers:
+
+  serviceAccount:
+    # default value is true
+    # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+    automountServiceAccountToken: true
+    # Specifies whether a ServiceAccount should be created
+    create: true
+    # The name of the ServiceAccount to use.
+    # If not set and create is true, a name is generated using the release name
+    name: workers
+    
+    # Annotations to add to webserver kubernetes service account.
+    # annotations:
+    #   azure.workload.identity/client-id: 5071b906-f678-48b8-8b10-8c2e0085ab4f
+    #   azure.workload.identity/tenant-id: e2549f04-593f-4003-8830-e134ab8e51cf
+
+  labels:
+    azure.workload.identity/use: "true"
+
+  resources:
+    limits:
+      memory: 3Gi
+    requests:
+      cpu: 500m
+      memory: 2Gi
+
+  keda:
+    minReplicaCount: 1
+    maxReplicaCount: 10
+    enabled: true
+
+
+  logGroomerSidecar:
+    # Whether to deploy the Airflow worker log groomer sidecar.
+    enabled: true
+    # Number of days to retain logs
+    retentionDays: 7
+    resources:
+      limits:
+        cpu: 100m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+# Airflow scheduler settings
+scheduler:
+  resources:
+    limits:
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+  logGroomerSidecar:
+    enabled: true
+    # Number of days to retain logs
+    retentionDays: 7
+    resources:
+      limits:
+        cpu: 100m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+  livenessProbe:
+    failureThreshold: 15
+    initialDelaySeconds: 15
+    periodSeconds: 60
+    timeoutSeconds: 60
+
+# Airflow create user job settings
+createUserJob:
+  useHelmHooks: false
+  applyCustomEnv: false
+  resources:
+    limits:
+      cpu: 100m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+# Airflow database migration job settings
+migrateDatabaseJob:
+  useHelmHooks: false
+  applyCustomEnv: false
+  jobAnnotations:
+    "argocd.argoproj.io/hook": Sync
+  resources:
+    limits:
+      cpu: 100m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+# Airflow webserver settings
+webserver:
+  resources:
+    limits:
+      memory: 3Gi
+    requests:
+      cpu: 200m
+      memory: 2Gi
+
+  serviceAccount:
+    # default value is true
+    # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+    automountServiceAccountToken: true
+    # Specifies whether a ServiceAccount should be created
+    create: true
+    # The name of the ServiceAccount to use.
+    # If not set and create is true, a name is generated using the release name
+    name: webserver
+    
+    # Annotations to add to webserver kubernetes service account.
+    # annotations:
+    #   azure.workload.identity/client-id: 5071b906-f678-48b8-8b10-8c2e0085ab4f
+    #   azure.workload.identity/tenant-id: e2549f04-593f-4003-8830-e134ab8e51cf
+
+  labels:
+    azure.workload.identity/use: "true"
+
+  # Create initial user.
+  defaultUser:
+    enabled: false
+    role: Admin
+    username: admin
+    email: admin@example.com
+    firstName: admin
+    lastName: user
+    password: admin
+
+# Airflow Triggerer Config
+triggerer:
+  resources:
+    limits:
+      memory: 1Gi
+    requests:
+      cpu: 1
+      memory: 512Mi
+  logGroomerSidecar:
+    # Number of days to retain logs
+    retentionDays: 7
+    resources:
+      limits:
+        cpu: 100m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+  livenessProbe:
+    failureThreshold: 15
+    initialDelaySeconds: 15
+    periodSeconds: 60
+    timeoutSeconds: 60
+
+# Airflow Dag Processor Config
+dagProcessor:
+  enabled: true
+  replicas: 1
+  resources:
+    limits:
+      cpu: 1
+      memory: 1Gi
+    requests:
+      cpu: 1
+      memory: 1Gi
+  securityContexts:
+    pod:
+      runAsUser: 50000
+      fsGroup: 0
+      runAsGroup: 0
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    container:
+      runAsUser: 50000
+      runAsGroup: 0
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+
+  logGroomerSidecar:
+    # Whether to deploy the Airflow dag processor log groomer sidecar.
+    enabled: true
+    # Command to use when running the Airflow dag processor log groomer sidecar (templated).
+    command: ~
+    # Args to use when running the Airflow dag processor log groomer sidecar (templated).
+    args: ["bash", "/clean-logs"]
+    # Number of days to retain logs
+    retentionDays: 7
+    resources:
+      limits:
+        cpu: 100m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+ 
+
+# StatsD settings
+statsd:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  securityContexts:
+    pod:
+      runAsUser: 50000
+      fsGroup: 0
+      runAsGroup: 0
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    container:
+      runAsUser: 50000
+      runAsGroup: 0
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+
+# Configuration for the redis provisioned by the chart
+redis:
+  enabled: true
+  resources:
+    limits:
+      cpu: 100m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  passwordSecretName: airflow-redis
+  securityContexts:
+    pod:
+      runAsUser: 50000
+      fsGroup: 0
+      runAsGroup: 0
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    container:
+      runAsUser: 50000
+      runAsGroup: 0
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+
+data:
+  brokerUrlSecretName: airflow-broker
+  metadataSecretName: airflow-metadata
+
+postgresql:
+  enabled: false
