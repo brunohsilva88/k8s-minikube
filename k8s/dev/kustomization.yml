@@ -1,7 +1,7 @@
 appVersion: kustomize.connfig.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: local-data-dev
+namespace: airflow-argo
 
 resources:
   - secrets/airflow-fernet-secret.yml
