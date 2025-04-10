@@ -3,6 +3,9 @@ kind: Kustomization
 
 namespace: local-data-dev
 
+resources:
+  - secrets/airflow-fernet-secret.yml
+
 helmCharts:
 - name: airflow
   namespace: local-data-dev
