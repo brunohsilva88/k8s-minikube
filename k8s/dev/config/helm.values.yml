@@ -13,15 +13,15 @@ webserver:
         targetPort: 8080
         nodePort: 30080  # Porta externa do NodePort
 
-secrets:
-  fernetKey: "WmHD2ZUvHTCieMSCGjkzZfMlHvvlT2Z6AB7ViLDaELg="
+# secrets:
+#   fernetKey: "WmHD2ZUvHTCieMSCGjkzZfMlHvvlT2Z6AB7ViLDaELg="
 
 # Airflow configurations
 config:
   AIRFLOW__CORE__EXECUTOR:
     value: "CeleryExecutor"
   AIRFLOW__CORE__FERNET_KEY:
-    value: "{{$env.AIRFLOW_FERNET_KEY}}"
+    value: "WmHD2ZUvHTCieMSCGjkzZfMlHvvlT2Z6AB7ViLDaELg="
   AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION:
     value: false
   AIRFLOW__CORE__LOAD_EXAMPLES:
