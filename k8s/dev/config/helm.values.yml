@@ -11,7 +11,7 @@ webserver:
     ports:
       - port: 8080
         targetPort: 8080
-        nodePort: 30080  # Defina a porta externa do NodePort
+        nodePort: 30080  # Porta externa do NodePort
 
 secrets:
   fernetKey: "WmHD2ZUvHTCieMSCGjkzZfMlHvvlT2Z6AB7ViLDaELg="
@@ -21,7 +21,10 @@ config:
   AIRFLOW__CORE__EXECUTOR:
     value: "CeleryExecutor"
   AIRFLOW__CORE__FERNET_KEY:
-    value: "{{ .Values.secrets.fernetKey }}"
+    valueFrom:
+      secretKeyRef:
+        name: airflow-fernet-key
+        key: fernetKey  # Refere-se ao Secret criado no Kubernetes
   AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION:
     value: false
   AIRFLOW__CORE__LOAD_EXAMPLES:
@@ -47,7 +50,7 @@ postgresql:
 
 # Redis for Celery executor (disabled if using LocalExecutor)
 redis:
-  enabled: True
+  enabled: true
 
 # Flower (task monitor) optional
 flower:
