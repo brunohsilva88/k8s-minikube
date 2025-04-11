@@ -11,7 +11,7 @@ webserver:
     ports:
       - port: 8080
         targetPort: 8080
-        nodePort: 8000  # Defina a porta externa do NodePort
+        nodePort: 30080  # Defina a porta externa do NodePort
 
 secrets:
   fernetKey: "WmHD2ZUvHTCieMSCGjkzZfMlHvvlT2Z6AB7ViLDaELg="
@@ -39,11 +39,15 @@ users:
 # Postgresql DB (optional: could use external DB in future)
 postgresql:
   enabled: true
-  postgresqlPassword: airflow
+  auth:
+    postgresPassword: airflow
+    username: airflow
+    password: airflow
+    database: airflow
 
 # Redis for Celery executor (disabled if using LocalExecutor)
 redis:
-  enabled: false
+  enabled: True
 
 # Flower (task monitor) optional
 flower:
