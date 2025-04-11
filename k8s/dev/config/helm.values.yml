@@ -21,14 +21,16 @@ config:
   AIRFLOW__CORE__EXECUTOR:
     value: "CeleryExecutor"
   AIRFLOW__CORE__FERNET_KEY:
-    valueFrom:
-      secretKeyRef:
-        name: airflow-fernet-key
-        key: fernetKey  # Refere-se ao Secret criado no Kubernetes
+    value: "{{$env.AIRFLOW_FERNET_KEY}}"
   AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION:
     value: false
   AIRFLOW__CORE__LOAD_EXAMPLES:
     value: true
+
+
+envFrom:
+  - secretRef:
+      name: airflow-fernet-key
 
 # Users - Admin default login
 users:
