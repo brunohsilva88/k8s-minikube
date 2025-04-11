@@ -1,27 +1,28 @@
 images:
   airflow:
     repository: apache/airflow
-    tag: 2.9.1  # ou outra versão estável que você queira
+    tag: 2.9.1
     pullPolicy: IfNotPresent
-
-# registry:
-#   secretName: "gitlab-registry-token"
-
-# Basic Airflow Helm Chart configuration for local dev environment
 
 # Webserver service settings
 webserver:
   service:
     type: NodePort
-    nodePort: 30080  # Minikube-friendly port
+    ports:
+      - port: 8080
+        targetPort: 8080
+        nodePort: 8000  # Defina a porta externa do NodePort
 
 # Airflow configurations
 config:
-  AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-  AIRFLOW__CORE__FERNET_KEY: "{{ .Values.secrets.fernetKey }}"
-  AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
-  AIRFLOW__CORE__LOAD_EXAMPLES: "true"
-
+  AIRFLOW__CORE__EXECUTOR:
+    value: "CeleryExecutor"
+  AIRFLOW__CORE__FERNET_KEY:
+    value: "{{ .Values.secrets.fernetKey }}"
+  AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION:
+    value: false
+  AIRFLOW__CORE__LOAD_EXAMPLES:
+    value: true
 
 # Users - Admin default login
 users:
@@ -52,10 +53,6 @@ triggerer:
 # Scheduler config
 scheduler:
   replicas: 1
-
-# Workers config - not used in LocalExecutor but required by chart
-workers:
-  enabled: false
 
 # Logs (can be enhanced with volumeMounts later)
 logs:
