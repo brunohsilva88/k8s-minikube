@@ -8,7 +8,7 @@ resources:
 
 helmCharts:
 - name: airflow
-  namespace: irflow-argo
+  namespace: airflow-argo
   releaseName: airflow
   repo: https://airflow.apache.org/
   version: 1.12.0
