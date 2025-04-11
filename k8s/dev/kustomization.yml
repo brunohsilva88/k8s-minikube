@@ -1,4 +1,4 @@
-appVersion: kustomize.connfig.k8s.io/v1beta1
+appVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 namespace: airflow-argo
