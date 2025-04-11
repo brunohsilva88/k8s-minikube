@@ -10,6 +10,6 @@ helmCharts:
 - name: airflow
   namespace: airflow-argo
   releaseName: airflow
-  repo: https://airflow.apache.org/
+  repo: https://airflow.apache.org
   version: 1.12.0
   valuesFile: config/helm.values.yml
